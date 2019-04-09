@@ -1,0 +1,29 @@
+{
+  "eos_snapshot_backup": {
+    "snapshot_url": "http://127.0.0.1:8881/v1/producer/create_snapshot",
+    "project_id": "618",
+    "key_filename": "./auth.json",
+    "bucket_name": "eos-snapshot-backups"
+  },
+  "eos_block_backup": {
+    "block_path": "/home/ubuntu/nodeos/data-dir/blocks/blocks.log",
+    "project_id": "618",
+    "key_filename": "./auth.json",
+    "bucket_name": "eos-block-backups"
+  },
+  "bp_monitor": {
+    "url": "http://fullnode.meet.one",
+    "alarm_type": "telegram",
+    "telegram": {
+      "token": "618:UMU618",
+      "chat_id": -618
+    },
+    "dingtalk": {
+      "token": "618"
+    }
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^2.5.0",
+    "node-fetch": "^2.3.0"
+  }
+}
