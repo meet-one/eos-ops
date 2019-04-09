@@ -146,9 +146,10 @@ function checkSchedule(state) {
       sendAlarm(message)
     }
   } else {
-    const message = producers[lastProducer][0] + ' missed 12 blocks, next is '
-      + producers[currentProducer][0] + ' from block '
-      + (producers[lastProducer][1] + 1) + '.'
+    const message = producers[lastProducer][0]
+      + ' missed 12 blocks, last produced ' + producers[lastProducer][1] + ', '
+      + producers[currentProducer][0] + ' is producing '
+      + producers[currentProducer][1] + '.'
     sendAlarm(message)
   }
 }
