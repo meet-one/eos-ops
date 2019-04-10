@@ -159,13 +159,14 @@ function checkSchedule(state) {
     cp = lp
   }
   if (failedCount > 0) {
-    let message = ''
+    let lastOk = getProducer(producers, currentProducer - failedCount - 1)
+    let message = lastOk[0] + ' last produced ' + lastOk[1] + '.\n'
     for (let i = failedCount; i > 0; --i) {
       cp = getProducer(producers, currentProducer - i)
-      message += cp[0] + ' missed 12 blocks, last produced ' + cp[1] + '. '
+      message += cp[0] + ' missed 12 blocks, last produced ' + cp[1] + '.\n'
     }
-    message += producers[currentProducer][0] + ' is producing '
-      + producers[currentProducer][1] + '.'
+    message += 'Next is ' + producers[currentProducer][0] + ' from block '
+      + (lastOk[1] + 1) + '.'
     sendAlarm(message)
   } else {
     let lastProducer = (currentProducer == 0) ? producers.length - 1
