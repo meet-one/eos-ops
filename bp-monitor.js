@@ -87,6 +87,8 @@ function getBlockHeaderState(blockNum) {
   })
 }
 
+let lastHeadBlockProducer = ''
+
 function checkHeadBlock() {
   fetch(BASE_URL + '/v1/chain/get_info', {method: 'POST'})
     .then((res) => {
@@ -101,7 +103,11 @@ function checkHeadBlock() {
     })
     .then((jo) => {
       if (jo) {
-        getBlockHeaderState(jo.head_block_num)
+        if (lastHeadBlockProducer != jo.head_block_producer) {
+          // Avoid needless duplication
+          lastHeadBlockProducer = jo.head_block_producer
+          getBlockHeaderState(jo.head_block_num)
+        }
       } else {
         console.error('no JSON.')
       }
@@ -119,6 +125,15 @@ function getCurrentProducer(producers, block_num) {
   throw new Error('Producer not found!')
 }
 
+function getProducer(producers, i) {
+  if (i < 0) {
+    i += producers.length
+  } else if (i >= producers.length) {
+    i -= producers.length
+  }
+  return producers[i]
+}
+
 function quantify(num, quantifier) {
   if (num > 1) {
     return num + ' ' + quantifier + 's'
@@ -129,27 +144,43 @@ function quantify(num, quantifier) {
 function checkSchedule(state) {
   let producers = state.producer_to_last_produced
   let currentProducer = getCurrentProducer(producers, state.block_num)
-  let lastProducer = (currentProducer == 0) ? producers.length - 1
-    : currentProducer - 1
-  let beforeLastProducer = (lastProducer == 0) ? producers.length - 1
-    : lastProducer - 1
 
-  if (producers[beforeLastProducer][1] < producers[lastProducer][1]) {
+  // check producers that lost all blocks
+  let failedCount = 0
+  let cp = currentProducer
+  for (let i = 0; i < producers.length; ++i) {
+    let lp = (cp == 0) ? producers.length - 1 : cp - 1
+    if (producers[currentProducer][1] - producers[lp][1]
+      > BLOCKS_PER_BP * (i + 1)) {
+      ++failedCount
+    } else {
+      break
+    }
+    cp = lp
+  }
+  if (failedCount > 0) {
+    let message = ''
+    for (let i = failedCount; i > 0; --i) {
+      cp = getProducer(producers, currentProducer - i)
+      message += cp[0] + ' missed 12 blocks, last produced ' + cp[1] + '. '
+    }
+    message += producers[currentProducer][0] + ' is producing '
+      + producers[currentProducer][1] + '.'
+    sendAlarm(message)
+  } else {
+    let lastProducer = (currentProducer == 0) ? producers.length - 1
+      : currentProducer - 1
+    let beforeLastProducer = (lastProducer == 0) ? producers.length - 1
+      : lastProducer - 1
     let diff = producers[lastProducer][1] - producers[beforeLastProducer][1]
     if (diff < BLOCKS_PER_BP) {
       const message = producers[lastProducer][0] + ' ['
         + (producers[beforeLastProducer][1] + 1) + ', '
         + producers[lastProducer][1] + '] missed '
-        + quantify(BLOCKS_PER_BP - diff, 'block') + ', next is '
+        + quantify(BLOCKS_PER_BP - diff, 'block') + '. Next is '
         + producers[currentProducer][0] + ' from block '
         + (producers[lastProducer][1] + 1) + '.'
       sendAlarm(message)
     }
-  } else {
-    const message = producers[lastProducer][0]
-      + ' missed 12 blocks, last produced ' + producers[lastProducer][1] + ', '
-      + producers[currentProducer][0] + ' is producing '
-      + producers[currentProducer][1] + '.'
-    sendAlarm(message)
   }
 }
