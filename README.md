@@ -40,7 +40,9 @@ yarn add @google-cloud/storage
 
 ### Snapshots Download
 
-<https://storage.googleapis.com/eos-snapshot-backups/>
+EOSIO Mainnet: <https://storage.googleapis.com/eosio-snapshot-backups/>
+
+MEET.ONE Sidechain Mainnet: <https://storage.googleapis.com/meetone-snapshot-backups/>
 
 ## 2. [eos-block-backup.js](eos-block-backup.js)
 
@@ -58,7 +60,9 @@ yarn add @google-cloud/storage
 
 ### Blocks Download
 
-<https://storage.googleapis.com/eos-block-backups/>
+EOSIO Mainnet: <https://storage.googleapis.com/eosio-block-backups/>
+
+MEET.ONE Sidechain Mainnet: <https://storage.googleapis.com/meetone-block-backups/>
 
 ## 3. [bp-monitor.js](bp-monitor.js)
 
