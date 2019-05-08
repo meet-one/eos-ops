@@ -40,6 +40,8 @@ module.exports = {
       .upload(filename)
       .then(() => {
         console.log(`${filename} is uploaded.`)
+        fs.unlinkSync(filename)
+        console.log(`${filename} is deleted.`)
         this.makePublic(storage, bucketName, uploadFilename)
       })
       .catch(err => {
