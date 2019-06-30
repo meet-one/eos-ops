@@ -141,8 +141,29 @@ function quantify(num, quantifier) {
   return num + ' ' + quantifier
 }
 
+function getActiveProducers(state) {
+  if (state.producer_to_last_produced.length
+    == state.producer_to_last_implied_irb.length) {
+    return state.producer_to_last_produced
+  } else {
+    let producers = []
+    let j = 0
+    for (let i = 0; i < state.producer_to_last_produced.length; ++i) {
+      if (state.producer_to_last_produced[i][0]
+        == state.active_schedule.producers[j].producer_name) {
+        producers.push(state.producer_to_last_produced[i])
+        ++j
+      } else {
+        // 2019-06-30, eosiosg.m 掉出前 21 名后，还一直存在于 producer_to_last_produced
+        //console.log(state.producer_to_last_produced[i][0])
+      }
+    }
+    return producers
+  }
+}
+
 function checkSchedule(state) {
-  let producers = state.producer_to_last_produced
+  let producers = getActiveProducers(state)
   let currentProducer = getCurrentProducer(producers, state.block_num)
 
   // check producers that lost all blocks
