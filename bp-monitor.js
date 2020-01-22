@@ -11,6 +11,7 @@
 
 const pkg = require('./package.json')
 const fetch = require('node-fetch')
+const bpContacts = require('./bp-contacts.json')
 const BLOCK_TIME = 500
 const BLOCKS_PER_BP = 12
 const BASE_URL = (new URL(pkg.bp_monitor.url)).origin
@@ -185,6 +186,9 @@ function checkSchedule(state) {
     for (let i = failedCount; i > 0; --i) {
       cp = getProducer(producers, currentProducer - i)
       message += cp[0] + ' missed 12 blocks, last produced ' + cp[1] + '.\n'
+      if (bpContacts[cp[0]]) {
+        meessage += bpContacts[cp[0]] + '\n'
+      }
     }
     message += 'Next is ' + producers[currentProducer][0] + ' from block '
       + (lastOk[1] + 1) + '.'
@@ -201,7 +205,10 @@ function checkSchedule(state) {
         + producers[lastProducer][1] + '] missed '
         + quantify(BLOCKS_PER_BP - diff, 'block') + '. Next is '
         + producers[currentProducer][0] + ' from block '
-        + (producers[lastProducer][1] + 1) + '.'
+        + (producers[lastProducer][1] + 1) + '.\n'
+      if (bpContacts[producers[lastProducer][0]]) {
+        meessage += bpContacts[cp[0]]
+      }
       sendAlarm(message)
     }
   }
