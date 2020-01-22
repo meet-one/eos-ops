@@ -207,7 +207,7 @@ function checkSchedule(state) {
         + producers[currentProducer][0] + ' from block '
         + (producers[lastProducer][1] + 1) + '.\n'
       if (bpContacts[producers[lastProducer][0]]) {
-        meessage += bpContacts[cp[0]]
+        meessage += bpContacts[producers[lastProducer][0]]
       }
       sendAlarm(message)
     }
